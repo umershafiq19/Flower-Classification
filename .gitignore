@@ -8,3 +8,7 @@ mlruns/
 __pycache__/
 *.log
 *.tmp
+.venv/
+mlruns/
+__pycache__/
+*.log
