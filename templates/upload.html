@@ -1,0 +1,721 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flower Species Classifier | ML App</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', sans-serif;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 50%, #7e8ba3 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: #333;
+        }
+        
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 30px;
+            padding-top: 20px;
+        }
+        
+        .header h1 {
+            font-size: 2.5em;
+            font-weight: 700;
+            margin-bottom: 8px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+        }
+        
+        .header .subtitle {
+            font-size: 1.1em;
+            opacity: 0.95;
+            font-weight: 300;
+        }
+        
+        .header .tech-stack {
+            margin-top: 15px;
+            font-size: 0.85em;
+            opacity: 0.8;
+        }
+        
+        .main-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+        }
+        
+        @media (max-width: 968px) {
+            .main-container {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        .card {
+            background: white;
+            border-radius: 20px;
+            padding: 35px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.15);
+        }
+        
+        .card-title {
+            font-size: 1.4em;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: #2a5298;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .upload-section {
+            min-height: 400px;
+        }
+        
+        .upload-zone {
+            border: 2px dashed #cbd5e0;
+            border-radius: 16px;
+            padding: 50px 30px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: #f7fafc;
+            position: relative;
+        }
+        
+        .upload-zone:hover {
+            border-color: #2a5298;
+            background: #edf2f7;
+            transform: translateY(-2px);
+        }
+        
+        .upload-zone.drag-over {
+            border-color: #2a5298;
+            background: #e6f7ff;
+            border-style: solid;
+        }
+        
+        .upload-icon {
+            font-size: 4em;
+            margin-bottom: 20px;
+            opacity: 0.7;
+        }
+        
+        .upload-text {
+            font-size: 1.1em;
+            color: #4a5568;
+            margin-bottom: 10px;
+        }
+        
+        .upload-hint {
+            font-size: 0.9em;
+            color: #718096;
+        }
+        
+        .file-input {
+            display: none;
+        }
+        
+        .preview-container {
+            margin-top: 25px;
+            display: none;
+        }
+        
+        .preview-wrapper {
+            position: relative;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        }
+        
+        .preview-image {
+            width: 100%;
+            height: auto;
+            display: block;
+            max-height: 350px;
+            object-fit: contain;
+            background: #f8f9fa;
+        }
+        
+        .preview-overlay {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            display: flex;
+            gap: 8px;
+        }
+        
+        .overlay-btn {
+            background: rgba(255,255,255,0.95);
+            border: none;
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2em;
+            transition: all 0.2s;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+        }
+        
+        .overlay-btn:hover {
+            transform: scale(1.1);
+            background: white;
+        }
+        
+        .file-info {
+            margin-top: 15px;
+            padding: 12px;
+            background: #f7fafc;
+            border-radius: 8px;
+            font-size: 0.9em;
+            color: #4a5568;
+        }
+        
+        .predict-btn {
+            width: 100%;
+            margin-top: 20px;
+            padding: 15px;
+            background: linear-gradient(135deg, #2a5298 0%, #1e3c72 100%);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 1.1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: none;
+        }
+        
+        .predict-btn:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(42, 82, 152, 0.4);
+        }
+        
+        .predict-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+        
+        .loading-state {
+            display: none;
+            text-align: center;
+            padding: 40px;
+        }
+        
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid #e2e8f0;
+            border-top-color: #2a5298;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin: 0 auto 20px;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        .loading-text {
+            color: #4a5568;
+            font-size: 1em;
+        }
+        
+        .results-section {
+            display: none;
+        }
+        
+        .result-header {
+            text-align: center;
+            padding: 25px;
+            background: linear-gradient(135deg, #2a5298 0%, #1e3c72 100%);
+            color: white;
+            border-radius: 12px;
+            margin-bottom: 25px;
+        }
+        
+        .result-icon {
+            font-size: 3em;
+            margin-bottom: 10px;
+        }
+        
+        .predicted-class {
+            font-size: 2em;
+            font-weight: 700;
+            margin: 10px 0;
+            text-transform: capitalize;
+        }
+        
+        .confidence-badge {
+            display: inline-block;
+            background: rgba(255,255,255,0.2);
+            padding: 8px 20px;
+            border-radius: 20px;
+            font-size: 1.1em;
+            font-weight: 500;
+        }
+        
+        .predictions-list {
+            margin-top: 25px;
+        }
+        
+        .prediction-header {
+            font-size: 1.1em;
+            font-weight: 600;
+            color: #2d3748;
+            margin-bottom: 15px;
+        }
+        
+        .prediction-item {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 15px;
+            margin-bottom: 12px;
+            background: #f7fafc;
+            border-radius: 10px;
+            transition: all 0.2s;
+        }
+        
+        .prediction-item:hover {
+            background: #edf2f7;
+            transform: translateX(5px);
+        }
+        
+        .prediction-label {
+            min-width: 100px;
+            font-weight: 500;
+            color: #2d3748;
+            text-transform: capitalize;
+        }
+        
+        .prediction-bar-container {
+            flex: 1;
+            height: 10px;
+            background: #e2e8f0;
+            border-radius: 5px;
+            overflow: hidden;
+        }
+        
+        .prediction-bar {
+            height: 100%;
+            background: linear-gradient(90deg, #2a5298 0%, #1e3c72 100%);
+            border-radius: 5px;
+            transition: width 0.6s ease;
+        }
+        
+        .prediction-percentage {
+            min-width: 55px;
+            text-align: right;
+            font-weight: 600;
+            color: #2a5298;
+        }
+        
+        .action-buttons {
+            display: flex;
+            gap: 12px;
+            margin-top: 25px;
+        }
+        
+        .btn {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 10px;
+            font-size: 1em;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #2a5298 0%, #1e3c72 100%);
+            color: white;
+        }
+        
+        .btn-secondary {
+            background: #e2e8f0;
+            color: #4a5568;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+        
+        .error-message {
+            display: none;
+            margin-top: 20px;
+            padding: 15px;
+            background: #fed7d7;
+            border-left: 4px solid #fc8181;
+            border-radius: 8px;
+            color: #742a2a;
+        }
+        
+        .error-icon {
+            margin-right: 8px;
+        }
+        
+        .info-section {
+            margin-top: 30px;
+            padding: 20px;
+            background: #f7fafc;
+            border-radius: 12px;
+            font-size: 0.9em;
+            color: #4a5568;
+        }
+        
+        .info-title {
+            font-weight: 600;
+            color: #2d3748;
+            margin-bottom: 10px;
+        }
+        
+        .info-list {
+            list-style: none;
+            padding-left: 0;
+        }
+        
+        .info-list li {
+            padding: 6px 0;
+            padding-left: 20px;
+            position: relative;
+        }
+        
+        .info-list li:before {
+            content: "🌸";
+            position: absolute;
+            left: 0;
+        }
+        
+        .footer {
+            text-align: center;
+            margin-top: 40px;
+            padding: 20px;
+            color: rgba(255,255,255,0.8);
+            font-size: 0.9em;
+        }
+        
+        .tech-badge {
+            display: inline-block;
+            background: rgba(255,255,255,0.2);
+            padding: 5px 12px;
+            border-radius: 15px;
+            margin: 0 5px;
+            font-size: 0.85em;
+            backdrop-filter: blur(10px);
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🌺 Flower Species Classifier</h1>
+        <p class="subtitle">AI-Powered Image Classification System</p>
+        <div class="tech-stack">
+            <span class="tech-badge">MLflow</span>
+            <span class="tech-badge">DagsHub</span>
+            <span class="tech-badge">Flask API</span>
+            <span class="tech-badge">TensorFlow</span>
+        </div>
+    </div>
+    
+    <div class="main-container">
+        <!-- Left Column: Upload Section -->
+        <div class="card upload-section">
+            <h2 class="card-title">
+                <span>📤</span>
+                Upload Image
+            </h2>
+            
+            <div class="upload-zone" id="uploadZone">
+                <div class="upload-icon">🖼️</div>
+                <p class="upload-text">
+                    <strong>Click to upload</strong> or drag and drop
+                </p>
+                <p class="upload-hint">
+                    Supports: JPG, PNG, JPEG • Max size: 16MB
+                </p>
+                <input type="file" id="fileInput" class="file-input" accept="image/*">
+            </div>
+            
+            <div class="preview-container" id="previewContainer">
+                <div class="preview-wrapper">
+                    <img id="previewImage" class="preview-image" src="" alt="Preview">
+                    <div class="preview-overlay">
+                        <button class="overlay-btn" onclick="removeImage()" title="Remove">
+                            ✕
+                        </button>
+                    </div>
+                </div>
+                <div class="file-info" id="fileInfo"></div>
+            </div>
+            
+            <button class="predict-btn" id="predictBtn">
+                🔍 Analyze Flower Species
+            </button>
+            
+            <div class="error-message" id="errorMessage">
+                <span class="error-icon">⚠️</span>
+                <span id="errorText"></span>
+            </div>
+            
+            <div class="info-section">
+                <div class="info-title">Supported Flower Species:</div>
+                <ul class="info-list">
+                    <li>Daisy</li>
+                    <li>Dandelion</li>
+                    <li>Roses</li>
+                    <li>Sunflowers</li>
+                    <li>Tulips</li>
+                </ul>
+            </div>
+        </div>
+        
+        <!-- Right Column: Results Section -->
+        <div class="card">
+            <h2 class="card-title">
+                <span>📊</span>
+                Prediction Results
+            </h2>
+            
+            <div class="loading-state" id="loadingState">
+                <div class="spinner"></div>
+                <p class="loading-text">Analyzing your flower image...</p>
+            </div>
+            
+            <div class="results-section" id="resultsSection">
+                <div class="result-header">
+                    <div class="result-icon">🌸</div>
+                    <div class="predicted-class" id="predictedClass">-</div>
+                    <div class="confidence-badge" id="confidenceBadge">-</div>
+                </div>
+                
+                <div class="predictions-list">
+                    <div class="prediction-header">All Predictions:</div>
+                    <div id="predictionsList"></div>
+                </div>
+                
+                <div class="action-buttons">
+                    <button class="btn btn-primary" onclick="resetForm()">
+                        🔄 Analyze Another
+                    </button>
+                    <button class="btn btn-secondary" onclick="downloadResults()">
+                        💾 Save Results
+                    </button>
+                </div>
+            </div>
+            
+            <div id="initialMessage" style="text-align: center; padding: 60px 20px; color: #a0aec0;">
+                <div style="font-size: 4em; margin-bottom: 20px;">🌺</div>
+                <p style="font-size: 1.1em; margin-bottom: 10px;">Upload a flower image to get started</p>
+                <p style="font-size: 0.9em;">Our AI model will identify the species and provide confidence scores</p>
+            </div>
+        </div>
+    </div>
+    
+    <div class="footer">
+        <p>Powered by MLflow Model Registry • Trained on TensorFlow Flowers Dataset</p>
+        <p style="margin-top: 8px; font-size: 0.85em;">MobileNetV2 Transfer Learning Architecture</p>
+    </div>
+    
+    <script>
+        const uploadZone = document.getElementById('uploadZone');
+        const fileInput = document.getElementById('fileInput');
+        const previewContainer = document.getElementById('previewContainer');
+        const previewImage = document.getElementById('previewImage');
+        const fileInfo = document.getElementById('fileInfo');
+        const predictBtn = document.getElementById('predictBtn');
+        const loadingState = document.getElementById('loadingState');
+        const resultsSection = document.getElementById('resultsSection');
+        const initialMessage = document.getElementById('initialMessage');
+        const errorMessage = document.getElementById('errorMessage');
+        const errorText = document.getElementById('errorText');
+        
+        let selectedFile = null;
+        
+        // Upload zone click
+        uploadZone.addEventListener('click', (e) => {
+            if (e.target.classList.contains('overlay-btn')) return;
+            fileInput.click();
+        });
+        
+        // File selection
+        fileInput.addEventListener('change', (e) => {
+            handleFile(e.target.files[0]);
+        });
+        
+        // Drag and drop
+        uploadZone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadZone.classList.add('drag-over');
+        });
+        
+        uploadZone.addEventListener('dragleave', () => {
+            uploadZone.classList.remove('drag-over');
+        });
+        
+        uploadZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadZone.classList.remove('drag-over');
+            handleFile(e.dataTransfer.files[0]);
+        });
+        
+        function handleFile(file) {
+            if (!file) return;
+            
+            if (!file.type.startsWith('image/')) {
+                showError('Please upload a valid image file');
+                return;
+            }
+            
+            if (file.size > 16 * 1024 * 1024) {
+                showError('File size must be less than 16MB');
+                return;
+            }
+            
+            selectedFile = file;
+            hideError();
+            
+            // Show preview
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                previewImage.src = e.target.result;
+                previewContainer.style.display = 'block';
+                predictBtn.style.display = 'block';
+                uploadZone.style.display = 'none';
+                
+                // Show file info
+                const sizeKB = (file.size / 1024).toFixed(2);
+                fileInfo.textContent = `📄 ${file.name} • ${sizeKB} KB`;
+            };
+            reader.readAsDataURL(file);
+            
+            // Hide results
+            resultsSection.style.display = 'none';
+            initialMessage.style.display = 'block';
+        }
+        
+        function removeImage() {
+            selectedFile = null;
+            fileInput.value = '';
+            previewContainer.style.display = 'none';
+            predictBtn.style.display = 'none';
+            uploadZone.style.display = 'block';
+            hideError();
+        }
+        
+        // Predict button
+        predictBtn.addEventListener('click', async () => {
+            if (!selectedFile) return;
+            
+            predictBtn.disabled = true;
+            loadingState.style.display = 'block';
+            resultsSection.style.display = 'none';
+            initialMessage.style.display = 'none';
+            hideError();
+            
+            const formData = new FormData();
+            formData.append('file', selectedFile);
+            
+            try {
+                const response = await fetch('/predict', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    displayResults(data);
+                } else {
+                    showError(data.error || 'Prediction failed. Please try again.');
+                }
+            } catch (error) {
+                showError('Network error: ' + error.message);
+            } finally {
+                loadingState.style.display = 'none';
+                predictBtn.disabled = false;
+            }
+        });
+        
+        function displayResults(data) {
+            // Update predicted class
+            document.getElementById('predictedClass').textContent = data.predicted_class.toUpperCase();
+            document.getElementById('confidenceBadge').textContent = data.confidence_percentage;
+            
+            // Build predictions list
+            const list = document.getElementById('predictionsList');
+            list.innerHTML = '';
+            
+            const sortedPredictions = Object.entries(data.all_predictions)
+                .sort((a, b) => b[1] - a[1]);
+            
+            sortedPredictions.forEach(([className, confidence]) => {
+                const percentage = (confidence * 100).toFixed(1);
+                const item = document.createElement('div');
+                item.className = 'prediction-item';
+                item.innerHTML = `
+                    <div class="prediction-label">${className}</div>
+                    <div class="prediction-bar-container">
+                        <div class="prediction-bar" style="width: ${percentage}%"></div>
+                    </div>
+                    <div class="prediction-percentage">${percentage}%</div>
+                `;
+                list.appendChild(item);
+            });
+            
+            // Show results
+            resultsSection.style.display = 'block';
+            initialMessage.style.display = 'none';
+        }
+        
+        function showError(message) {
+            errorText.textContent = message;
+            errorMessage.style.display = 'block';
+        }
+        
+        function hideError() {
+            errorMessage.style.display = 'none';
+        }
+        
+        function resetForm() {
+            removeImage();
+            resultsSection.style.display = 'none';
+            initialMessage.style.display = 'block';
+        }
+        
+        function downloadResults() {
+            const predictedClass = document.getElementById('predictedClass').textContent;
+            const confidence = document.getElementById('confidenceBadge').textContent;
+            
+            const results = `Flower Classification Results\n\n` +
+                `Predicted Species: ${predictedClass}\n` +
+                `Confidence: ${confidence}\n\n` +
+                `Generated by MLflow Flower Classifier\n` +
+                `Timestamp: ${new Date().toLocaleString()}`;
+            
+            const blob = new Blob([results], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'flower-prediction-results.txt';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+    </script>
+</body>
+</html>
