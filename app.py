@@ -18,9 +18,12 @@ MODEL_NAME = "flowers_classifier"
 MODEL_STAGE = "Production"
 
 # DagsHub Credentials - UPDATE THESE!
-DAGSHUB_USERNAME = "<YOUR_DAGSHUB_USERNAME>"
-DAGSHUB_REPO = "<YOUR_DAGS_HUB_REPO>"
-DAGSHUB_TOKEN = "<DAGSHUB_TOKEN>"
+import os
+
+DAGSHUB_USERNAME = os.getenv("DAGSHUB_USERNAME")
+DAGSHUB_REPO = os.getenv("DAGSHUB_REPO")
+DAGSHUB_TOKEN = os.getenv("DAGSHUB_TOKEN")
+
 
 # Class names
 CLASS_NAMES = ['dandelion', 'daisy', 'tulips', 'sunflowers', 'roses']
