@@ -18,9 +18,9 @@ MODEL_NAME = "flowers_classifier"
 MODEL_STAGE = "Production"
 
 # DagsHub Credentials - UPDATE THESE!
-DAGSHUB_USERNAME = "umershafiq19"
-DAGSHUB_REPO = "mlflow-flask-flowers"
-DAGSHUB_TOKEN = "a5afdf666eae7d4e44861283d58c4efaa7097fd1"
+DAGSHUB_USERNAME = "<YOUR_DAGSHUB_USERNAME>"
+DAGSHUB_REPO = "<YOUR_DAGS_HUB_REPO>"
+DAGSHUB_TOKEN = "<DAGSHUB_TOKEN>"
 
 # Class names
 CLASS_NAMES = ['dandelion', 'daisy', 'tulips', 'sunflowers', 'roses']
