@@ -212,7 +212,7 @@ In terminal:
     git init
     git add .
     git commit -m "Complete MLflow Flask Assignment"
-    git remote add origin https://dagshub.com/YOUR_USERNAME/mlflow-flask-assignment.git
+    git remote add origin https://dagshub.com/<YOUR_USERNAME>/mlflow-flask-flowers.git
     git branch -M main
     git push -u origin main
 
