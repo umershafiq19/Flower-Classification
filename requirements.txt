@@ -6,3 +6,4 @@ numpy==1.26.4
 pillow==10.2.0
 matplotlib==3.8.2
 gunicorn
+gdown==5.2.0
