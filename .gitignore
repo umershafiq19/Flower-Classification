@@ -1,15 +1,29 @@
 # Ignore virtual environment
-.venv/
+venv/
+.env/
 
-# Ignore MLflow runs
-mlruns/
+# Ignore Python cache
+__pycache__/
+*.pyc
 
-# Ignore cache, logs, and local files
-__pycache__/
-*.log
-*.tmp
-.venv/
+# Ignore MLflow artifacts and logs
 mlruns/
-__pycache__/
+*.db
+
+# Ignore datasets and large model files
+*.h5
+*.hdf5
+*.keras
+*.ckpt
+*.tflite
+*.pb
+*.pkl
+*.joblib
+
+# Ignore TensorFlow / Keras cache
+~/.keras/
+.cache/
+
+# Ignore temporary files
+.DS_Store
 *.log
-"*.keras" 

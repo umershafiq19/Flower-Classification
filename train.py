@@ -19,13 +19,13 @@ EPOCHS = 10
 LEARNING_RATE = 0.001
 
 # DagsHub Credentials - UPDATE THESE!
-DAGSHUB_USERNAME = "umershafiq19"
-DAGSHUB_REPO = "mlflow-flask-flowers"
-DAGSHUB_TOKEN = "a5afdf666eae7d4e44861283d58c4efaa7097fd1"
+DAGSHUB_USERNAME = os.getenv("DAGSHUB_USERNAME")
+DAGSHUB_REPO = os.getenv("DAGSHUB_REPO")
+DAGSHUB_TOKEN = os.getenv("DAGSHUB_TOKEN")
 
 # Set MLflow tracking
-os.environ['MLFLOW_TRACKING_USERNAME'] = DAGSHUB_USERNAME
-os.environ['MLFLOW_TRACKING_PASSWORD'] = DAGSHUB_TOKEN
+os.environ['MLFLOW_TRACKING_USERNAME'] = os.getenv("DAGSHUB_USERNAME")
+os.environ['MLFLOW_TRACKING_PASSWORD'] = os.getenv("DAGSHUB_TOKEN")
 mlflow.set_tracking_uri(f"https://dagshub.com/{DAGSHUB_USERNAME}/{DAGSHUB_REPO}.mlflow")
 
 
